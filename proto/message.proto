@@ -1,0 +1,45 @@
+syntax = "proto3";
+package common;
+option go_package = "../common";
+
+
+message Transaction {
+    int64 op = 1;
+    string table = 2;
+    string keyName = 3;
+    repeated string fields = 4;
+    map<string, bytes> values = 5;
+}
+
+message Transactions {
+    int32   clientId = 1;
+    int64   startId = 2;
+    repeated Transaction txs = 3;
+}
+
+
+
+message cmdsReqeust {
+    int32 id = 1;
+}
+message cmdsReply {
+    bytes payload = 1;   // store serialized Transactions which were generated before
+}
+
+message executeRequest {
+    bytes payload = 1;  // store serialized Transactions which are to be executed
+}
+
+message executeReply {  
+
+}
+
+service YCSBServer {
+  // request server to generate workload
+  rpc GetCmds (cmdsReqeust) returns (cmdsReply) {}
+  // send ready cmds to server 
+  rpc ExecuteCmds (executeRequest) returns (executeReply) {}
+}
+
+
+// protoc -I=. -I=$GOPATH/src -I=$GOPATH/src/github.com/gogo/protobuf/protobuf --gogofaster_out=../common message.proto
